@@ -41,12 +41,11 @@ function todayISO(): string {
 
 function toUpperHex(buffer: ArrayBuffer): string {
   const bytes = new Uint8Array(buffer);
-  let hex = "";
+  const hexArray = [];
   for (let i = 0; i < bytes.length; i++) {
-    const h = bytes[i].toString(16).padStart(2, "0");
-    hex += h;
+    hexArray.push(bytes[i].toString(16).padStart(2, "0"));
   }
-  return hex.toUpperCase();
+  return hexArray.join("").toUpperCase();
 }
 
 async function hmacSHA256_hex(keyStr: string, message: string): Promise<string> {
