@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de références HEX (7+1) - Enhanced</title>
+    <style>
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --accent-primary: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --border-hover: #475569;
+            --accent-primary: #3b82f6;
+            --accent-hover: #60a5fa;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(to bottom, var(--bg-primary), var(--bg-secondary));
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 1.5rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 64rem;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 20px 25px -5px var(--shadow);
+        }
+
+        .card-header {
+            padding: 1.5rem 1.5rem 0;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .theme-toggle:hover {
+            background: var(--border-hover);
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 500;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        input, select, textarea {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        input:hover, select:hover, textarea:hover {
+            border-color: var(--border-hover);
+        }
+
+        .result-textarea {
+            font-family: 'Courier New', monospace;
+            font-size: 1.125rem;
+            letter-spacing: 0.1em;
+            height: 4rem;
+            resize: none;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background: var(--bg-tertiary);
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .switch {
+            position: relative;
+            width: 2.75rem;
+            height: 1.5rem;
+            background: var(--border-color);
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .switch.checked {
+            background: var(--accent-primary);
+        }
+
+        .switch-thumb {
+            position: absolute;
+            top: 0.125rem;
+            left: 0.125rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        .switch.checked .switch-thumb {
+            transform: translateX(1.25rem);
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+        }
+
+        .text-xs {
+            font-size: 0.75rem;
+        }
+
+        .text-slate-500 {
+            color: var(--text-secondary);
+        }
+
+        .text-red-600 {
+            color: var(--error);
+        }
+
+        .font-mono {
+            font-family: 'Courier New', monospace;
+        }
+
+        .font-medium {
+            font-weight: 500;
+        }
+
+        .mt-1 {
+            margin-top: 0.25rem;
+        }
+
+        .mt-2 {
+            margin-top: 0.5rem;
+        }
+
+        .alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--warning);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            color: var(--warning);
+        }
+
+        .toast {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 10px 15px -3px var(--shadow);
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            max-width: 300px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--error);
+        }
+
+        .toast.warning {
+            border-left: 4px solid var(--warning);
+        }
+
+        .error {
+            color: #dc2626;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            font-size: 0.875rem;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            border-radius: 0.375rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-primary);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        th {
+            font-weight: 500;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .icon-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .space-y-2 > * + * {
+            margin-top: 0.5rem;
+        }
+
+        .space-y-6 > * + * {
+            margin-top: 1.5rem;
+        }
+
+        .keyboard-shortcut {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-primary);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        Générateur de références HEX (7+1) - Enhanced
+                        <svg class="icon" id="status-icon" viewBox="0 0 24 24">
+                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                        </svg>
+                    </div>
+                    <button class="theme-toggle" id="theme-toggle" title="Basculer le thème">
+                        <svg class="icon-sm" id="theme-icon" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                    </button>
+                </h1>
+            </div>
+            <div class="card-content space-y-6">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="type">Type de procédure</label>
+                        <select id="type">
+                            <option value="C">C — Civil / Responsabilité</option>
+                            <option value="M" selected>M — Médical / Santé</option>
+                            <option value="S">S — Successoral / Héritage</option>
+                            <option value="I">I — Immobilier</option>
+                            <option value="A">A — Académique / Étudiant</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="date">Date (ISO)</label>
+                        <input type="date" id="date">
+                    </div>
+                    <div class="form-group">
+                        <label for="juridiction">Juridiction (code interne)</label>
+                        <input type="text" id="juridiction" placeholder="CH-BL / ES-LE / ..." value="CH-BL">
+                    </div>
+                    <div class="form-group">
+                        <label for="canal">Canal</label>
+                        <input type="text" id="canal" placeholder="WEB / CLI / MOBILE" value="WEB">
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="secret">
+                        Secret (secret_salt)
+                        <svg class="icon-sm" id="secret-icon" viewBox="0 0 24 24">
+                            <path d="M9 12l2 2 4-4"></path>
+                            <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"></path>
+                            <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"></path>
+                            <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3"></path>
+                            <path d="M12 21c0-1 1-3 3-3s3 2 3 3-1 3-3 3-3-2-3-3"></path>
+                        </svg>
+                    </label>
+                    <input type="password" id="secret" placeholder="Saisir le secret...">
+                    <div class="switch-container">
+                        <div class="switch" id="remember-switch">
+                            <div class="switch-thumb"></div>
+                        </div>
+                        <label for="remember-switch">Mémoriser localement le secret (optionnel)</label>
+                    </div>
+                    <div class="alert">
+                        <svg class="icon-sm" viewBox="0 0 24 24">
+                            <path d="M12 9v4"></path>
+                            <path d="M12 17h.01"></path>
+                            <path d="M12 2L2 22h20L12 2z"></path>
+                        </svg>
+                        Le secret n'est jamais inclus dans l'ID ; il sert uniquement au HMAC. En environnement partagé, ne le mémorisez pas.
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" id="generate-btn">
+                        <span id="generate-text">Générer la référence</span>
+                        <span class="keyboard-shortcut">Ctrl+G</span>
+                    </button>
+                    <button class="btn-secondary" id="copy-btn" disabled>
+                        Copier
+                        <span class="keyboard-shortcut">Ctrl+C</span>
+                    </button>
+                    <button class="btn-outline" id="export-btn" disabled>
+                        <svg class="icon-sm" viewBox="0 0 24 24">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7,10 12,15 17,10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Exporter l'historique (CSV)
+                    </button>
+                    <button class="btn-outline" id="generate-random-secret">
+                        <svg class="icon-sm" viewBox="0 0 24 24">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                            <path d="M2 17l10 5 10-5"></path>
+                            <path d="M2 12l10 5 10-5"></path>
+                        </svg>
+                        Secret aléatoire
+                    </button>
+                </div>
+
+                <div class="progress-bar" id="progress-bar" style="display: none;">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Référence générée</label>
+                    <textarea class="result-textarea" id="result" readonly placeholder="—"></textarea>
+                    <p class="text-xs text-slate-500 mt-1">Format garanti : <span class="font-mono">^[0-9A-F]{7}[CMSIA]$</span></p>
+                </div>
+
+                <div id="error-message" class="error hidden"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                            <path d="M3 3v5h5"></path>
+                            <path d="M12 7v5l4 2"></path>
+                        </svg>
+                        Historique & Statistiques
+                    </div>
+                </h2>
+            </div>
+            <div class="card-content">
+                <div class="stats-grid" id="stats-grid" style="display: none;">
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-generated">0</div>
+                        <div class="stat-label">Total généré</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="today-generated">0</div>
+                        <div class="stat-label">Aujourd'hui</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="most-used-type">-</div>
+                        <div class="stat-label">Type le plus utilisé</div>
+                    </div>
+                </div>
+
+                <div id="history-empty" class="text-sm text-slate-500">
+                    Aucune référence encore générée.
+                </div>
+                <div id="history-table" class="table-container hidden">
+                    <div class="search-container">
+                        <input type="text" class="search-input" id="search-input" placeholder="Rechercher dans l'historique...">
+                        <svg class="icon-sm search-icon" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Juridiction</th>
+                                <th>Canal</th>
+                                <th>Créé le</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Détails techniques (résumé)</h2>
+            </div>
+            <div class="card-content text-sm text-slate-500 space-y-2">
+                <p><strong>Chaîne canonique</strong> : <span class="font-mono">v1|{type}|{date}|{juridiction}|{canal}|{compteur_local}|{secret_salt}</span></p>
+                <p><strong>Hachage</strong> : HMAC‑SHA256(secret, canon) → hex → 7 premiers → + lettre type.</p>
+                <p><strong>Idempotence</strong> : si le même <span class="font-mono">v1|type|date|jur|canal</span> a déjà un ID, on renvoie l'ID existant.</p>
+                <p><strong>Unicité locale</strong> : compteur local par couple (type, date, juridiction, canal). Collisions rares, mais gérées par incrément.</p>
+                <p><strong>Limites</strong> : en multi‑poste sans backend partagé, l'unicité n'est garantie que par instance.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container"></div>
+
+    <script>
+        const VERSION = "v1";
+        const ID_REGEX = /^[0-9A-F]{7}[CMSIA]$/;
+
+        const LS_IDS = "hexRef:ids";
+        const LS_BASE_INDEX = "hexRef:baseIndex";
+        const LS_COUNTERS = "hexRef:counters";
+        const LS_HISTORY = "hexRef:history";
+        const LS_SECRET = "hexRef:secret";
+        const LS_REMEMBER = "hexRef:remember";
+
+        let currentStatus = "idle";
+        let rememberSecret = false;
+        let filteredHistory = [];
+        let currentTheme = localStorage.getItem('theme') || 'light';
+
+        function todayISO() {
+            const d = new Date();
+            const tz = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+            return tz.toISOString().slice(0, 10);
+        }
+
+        function toUpperHex(buffer) {
+            const bytes = new Uint8Array(buffer);
+            let hex = "";
+            for (let i = 0; i < bytes.length; i++) {
+                const h = bytes[i].toString(16).padStart(2, "0");
+                hex += h;
+            }
+            return hex.toUpperCase();
+        }
+
+        // Enhanced security: Input sanitization
+        function sanitizeInput(input) {
+            if (typeof input !== 'string') return '';
+            return input.replace(/[<>\"'&]/g, '').trim();
+        }
+
+        // Enhanced security: Generate random secret
+        function generateRandomSecret(length = 32) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+            let result = '';
+            const array = new Uint8Array(length);
+            crypto.getRandomValues(array);
+            for (let i = 0; i < length; i++) {
+                result += chars[array[i] % chars.length];
+            }
+            return result;
+        }
+
+        // Enhanced security: Simple encryption for localStorage
+        async function encryptData(data, key) {
+            const encoder = new TextEncoder();
+            const keyData = await crypto.subtle.importKey(
+                'raw',
+                encoder.encode(key),
+                { name: 'AES-GCM' },
+                false,
+                ['encrypt']
+            );
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const encrypted = await crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv },
+                keyData,
+                encoder.encode(JSON.stringify(data))
+            );
+            return {
+                iv: Array.from(iv),
+                data: Array.from(new Uint8Array(encrypted))
+            };
+        }
+
+        async function decryptData(encryptedData, key) {
+            try {
+                const encoder = new TextEncoder();
+                const decoder = new TextDecoder();
+                const keyData = await crypto.subtle.importKey(
+                    'raw',
+                    encoder.encode(key),
+                    { name: 'AES-GCM' },
+                    false,
+                    ['decrypt']
+                );
+                const decrypted = await crypto.subtle.decrypt(
+                    { name: 'AES-GCM', iv: new Uint8Array(encryptedData.iv) },
+                    keyData,
+                    new Uint8Array(encryptedData.data)
+                );
+                return JSON.parse(decoder.decode(decrypted));
+            } catch {
+                return null;
+            }
+        }
+
+        // Toast notifications
+        function showToast(message, type = 'success', duration = 3000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <svg class="icon-sm" viewBox="0 0 24 24">
+                        ${type === 'success' ? '<path d="M9 12l2 2 4-4"></path><circle cx="12" cy="12" r="10"></circle>' :
+                          type === 'error' ? '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>' :
+                          '<path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M12 2L2 22h20L12 2z"></path>'}
+                    </svg>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            // Remove toast
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => container.removeChild(toast), 300);
+            }, duration);
+        }
+
+        // Theme management
+        function setTheme(theme) {
+            currentTheme = theme;
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            updateThemeIcon();
+        }
+
+        function toggleTheme() {
+            setTheme(currentTheme === 'light' ? 'dark' : 'light');
+            showToast(`Thème ${currentTheme === 'light' ? 'clair' : 'sombre'} activé`, 'success');
+        }
+
+        function updateThemeIcon() {
+            const icon = document.getElementById('theme-icon');
+            if (currentTheme === 'dark') {
+                icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+            } else {
+                icon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+            }
+        }
+
+        async function hmacSHA256_hex(keyStr, message) {
+            const enc = new TextEncoder();
+            const keyData = enc.encode(keyStr);
+            const msgData = enc.encode(message);
+            const cryptoKey = await crypto.subtle.importKey(
+                "raw",
+                keyData,
+                { name: "HMAC", hash: { name: "SHA-256" } },
+                false,
+                ["sign"]
+            );
+            const sig = await crypto.subtle.sign("HMAC", cryptoKey, msgData);
+            return toUpperHex(sig);
+        }
+
+        function assertTypeLetter(t) {
+            const up = t.toUpperCase();
+            if (!["C", "M", "S", "I", "A"].includes(up)) {
+                throw new Error("Type invalide : doit être C, M, S, I ou A");
+            }
+        }
+
+        function readJSON(key, fallback) {
+            try {
+                const raw = localStorage.getItem(key);
+                if (!raw) return fallback;
+                return JSON.parse(raw);
+            } catch {
+                return fallback;
+            }
+        }
+
+        function writeJSON(key, value) {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+
+        function existsId(id) {
+            const ids = readJSON(LS_IDS, {});
+            return Boolean(ids[id]);
+        }
+
+        function saveContext(ctx) {
+            const ids = readJSON(LS_IDS, {});
+            ids[ctx.id] = ctx;
+            writeJSON(LS_IDS, ids);
+
+            const baseIndex = readJSON(LS_BASE_INDEX, {});
+            baseIndex[ctx.baseCanonical] = ctx.id;
+            writeJSON(LS_BASE_INDEX, baseIndex);
+
+            const hist = readJSON(LS_HISTORY, []);
+            hist.unshift({
+                id: ctx.id,
+                type: ctx.type,
+                date: ctx.date,
+                juridiction: ctx.juridiction,
+                canal: ctx.canal,
+                createdAt: ctx.createdAt
+            });
+            if (hist.length > 200) hist.length = 200;
+            writeJSON(LS_HISTORY, hist);
+        }
+
+        function getIdByBase(baseCanonical) {
+            const baseIndex = readJSON(LS_BASE_INDEX, {});
+            return baseIndex[baseCanonical] || null;
+        }
+
+        function getLastCounter(baseCanonical) {
+            const counters = readJSON(LS_COUNTERS, {});
+            return Number.isInteger(counters[baseCanonical]) ? counters[baseCanonical] : 0;
+        }
+
+        function bumpCounter(baseCanonical, newValue) {
+            const counters = readJSON(LS_COUNTERS, {});
+            counters[baseCanonical] = newValue;
+            writeJSON(LS_COUNTERS, counters);
+        }
+
+        function getStoredSecret() {
+            const remember = localStorage.getItem(LS_REMEMBER) === "true";
+            if (!remember) return null;
+            const s = localStorage.getItem(LS_SECRET);
+            return s && s.length > 0 ? s : null;
+        }
+
+        function setStoredSecret(secret, remember) {
+            localStorage.setItem(LS_REMEMBER, remember ? "true" : "false");
+            if (remember && secret) {
+                localStorage.setItem(LS_SECRET, secret);
+            } else {
+                localStorage.removeItem(LS_SECRET);
+            }
+        }
+
+        function normalizeInputs(raw) {
+            const t = sanitizeInput(raw.type).toUpperCase();
+            assertTypeLetter(t);
+
+            const date = (raw.date && /\d{4}-\d{2}-\d{2}/.test(raw.date)) ? raw.date : todayISO();
+            const juridiction = sanitizeInput(raw.juridiction || "").toUpperCase();
+            const canal = sanitizeInput(raw.canal || "WEB").toUpperCase();
+            const secret_salt = (raw.secret_salt || "").toString();
+            if (!secret_salt) throw new Error("Le secret (secret_salt) est requis.");
+            if (secret_salt.length < 8) throw new Error("Le secret doit contenir au moins 8 caractères.");
+
+            const baseCanonical = `${VERSION}|${t}|${date}|${juridiction}|${canal}`;
+            const last = getLastCounter(baseCanonical);
+
+            return { type: t, date, juridiction, canal, compteur_local: last, secret_salt };
+        }
+
+        function baseCanonicalOf(inp) {
+            return `${VERSION}|${inp.type}|${inp.date}|${inp.juridiction}|${inp.canal}`;
+        }
+
+        function fullCanonicalOf(inp) {
+            return `${VERSION}|${inp.type}|${inp.date}|${inp.juridiction}|${inp.canal}|${inp.compteur_local}|${inp.secret_salt}`;
+        }
+
+        async function generateId(rawInputs) {
+            let inputs = normalizeInputs(rawInputs);
+            const baseCanonical = baseCanonicalOf(inputs);
+
+            const existing = getIdByBase(baseCanonical);
+            if (existing) {
+                return existing;
+            }
+
+            for (let tries = 0; tries <= 5; tries++) {
+                const canonical = fullCanonicalOf(inputs);
+                const digestHex = await hmacSHA256_hex(inputs.secret_salt, canonical);
+                const hex7 = digestHex.slice(0, 7).toUpperCase();
+                const id = `${hex7}${inputs.type}`;
+
+                if (!ID_REGEX.test(id)) {
+                    throw new Error("ID généré invalide (format)");
+                }
+
+                if (!existsId(id)) {
+                    const ctx = {
+                        id,
+                        baseCanonical,
+                        fullCanonical: canonical,
+                        type: inputs.type,
+                        date: inputs.date,
+                        juridiction: inputs.juridiction,
+                        canal: inputs.canal,
+                        compteur_local: inputs.compteur_local,
+                        createdAt: new Date().toISOString(),
+                    };
+                    saveContext(ctx);
+                    bumpCounter(baseCanonical, inputs.compteur_local + 1);
+                    return id;
+                } else {
+                    const ids = readJSON(LS_IDS, {});
+                    const found = ids[id];
+                    if (found && found.fullCanonical === canonical) {
+                        return id;
+                    }
+                    inputs.compteur_local++;
+                }
+            }
+            throw new Error("Collision non résolue après 6 tentatives");
+        }
+
+        function updateStatus(status) {
+            currentStatus = status;
+            const statusIcon = document.getElementById('status-icon');
+            const generateBtn = document.getElementById('generate-btn');
+            const generateText = document.getElementById('generate-text');
+
+            if (status === 'ok') {
+                statusIcon.innerHTML = '<path d="M9 12l2 2 4-4"></path><path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"></path><path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"></path>';
+            } else {
+                statusIcon.innerHTML = '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>';
+            }
+
+            if (status === 'working') {
+                generateText.textContent = 'Génération...';
+                generateBtn.disabled = true;
+            } else {
+                generateText.textContent = 'Générer la référence';
+                generateBtn.disabled = !canGenerate();
+            }
+        }
+
+        function canGenerate() {
+            const secret = document.getElementById('secret').value.trim();
+            const type = document.getElementById('type').value;
+            const date = document.getElementById('date').value;
+            const jur = document.getElementById('juridiction').value.trim();
+            const canal = document.getElementById('canal').value.trim();
+
+            return (
+                secret.length > 0 &&
+                ["C", "M", "S", "I", "A"].includes(type) &&
+                /^\d{4}-\d{2}-\d{2}$/.test(date) &&
+                jur.length > 0 &&
+                canal.length > 0
+            );
+        }
+
+        function updateSecretIcon() {
+            const secretIcon = document.getElementById('secret-icon');
+            if (rememberSecret) {
+                secretIcon.innerHTML = '<path d="M9 12l2 2 4-4"></path><path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"></path><path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"></path>';
+            } else {
+                secretIcon.innerHTML = '<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" y1="2" x2="22" y2="22"></line>';
+            }
+        }
+
+        function updateHistory() {
+            const history = readJSON(LS_HISTORY, []);
+            filteredHistory = history;
+            const emptyDiv = document.getElementById('history-empty');
+            const tableDiv = document.getElementById('history-table');
+            const tbody = document.getElementById('history-tbody');
+            const exportBtn = document.getElementById('export-btn');
+            const statsGrid = document.getElementById('stats-grid');
+
+            if (history.length === 0) {
+                emptyDiv.classList.remove('hidden');
+                tableDiv.classList.add('hidden');
+                statsGrid.style.display = 'none';
+                exportBtn.disabled = true;
+            } else {
+                emptyDiv.classList.add('hidden');
+                tableDiv.classList.remove('hidden');
+                statsGrid.style.display = 'grid';
+                exportBtn.disabled = false;
+
+                updateStats(history);
+                renderHistoryTable(filteredHistory);
+            }
+        }
+
+        function updateStats(history) {
+            const today = todayISO();
+            const todayCount = history.filter(h => h.date === today).length;
+            const typeCounts = history.reduce((acc, h) => {
+                acc[h.type] = (acc[h.type] || 0) + 1;
+                return acc;
+            }, {});
+            const mostUsedType = Object.keys(typeCounts).reduce((a, b) => 
+                typeCounts[a] > typeCounts[b] ? a : b, '-');
+
+            document.getElementById('total-generated').textContent = history.length;
+            document.getElementById('today-generated').textContent = todayCount;
+            document.getElementById('most-used-type').textContent = mostUsedType;
+        }
+
+        function renderHistoryTable(history) {
+            const tbody = document.getElementById('history-tbody');
+            tbody.innerHTML = '';
+            
+            history.forEach((h, i) => {
+                const row = document.createElement('tr');
+                row.className = 'fade-in';
+                row.innerHTML = `
+                    <td class="font-mono">${h.id}</td>
+                    <td>${h.type}</td>
+                    <td>${h.date}</td>
+                    <td>${h.juridiction}</td>
+                    <td>${h.canal}</td>
+                    <td>${new Date(h.createdAt).toLocaleString()}</td>
+                    <td>
+                        <button class="btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="copyId('${h.id}')">
+                            Copier
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function filterHistory(searchTerm) {
+            const history = readJSON(LS_HISTORY, []);
+            if (!searchTerm) {
+                filteredHistory = history;
+            } else {
+                const term = searchTerm.toLowerCase();
+                filteredHistory = history.filter(h => 
+                    h.id.toLowerCase().includes(term) ||
+                    h.type.toLowerCase().includes(term) ||
+                    h.juridiction.toLowerCase().includes(term) ||
+                    h.canal.toLowerCase().includes(term) ||
+                    h.date.includes(term)
+                );
+            }
+            renderHistoryTable(filteredHistory);
+        }
+
+        function copyId(id) {
+            navigator.clipboard.writeText(id).then(() => {
+                showToast(`ID ${id} copié !`, 'success');
+            }).catch(() => {
+                showToast('Erreur lors de la copie', 'error');
+            });
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = `Erreur : ${message}`;
+            errorDiv.classList.remove('hidden');
+        }
+
+        function hideError() {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.classList.add('hidden');
+        }
+
+        async function onGenerate() {
+            updateStatus('working');
+            hideError();
+            showProgress();
+
+            try {
+                const type = document.getElementById('type').value;
+                const date = document.getElementById('date').value;
+                const jur = document.getElementById('juridiction').value;
+                const canal = document.getElementById('canal').value;
+                const secret = document.getElementById('secret').value;
+
+                // Simulate progress for better UX
+                updateProgress(30);
+                
+                const id = await generateId({
+                    type,
+                    date,
+                    juridiction: jur,
+                    canal,
+                    secret_salt: secret
+                });
+
+                updateProgress(80);
+                
+                document.getElementById('result').value = id;
+                document.getElementById('copy-btn').disabled = false;
+                updateStatus('ok');
+                updateHistory();
+                setStoredSecret(secret, rememberSecret);
+                
+                updateProgress(100);
+                setTimeout(hideProgress, 500);
+                
+                showToast(`Référence ${id} générée avec succès !`, 'success');
+            } catch (e) {
+                updateStatus('error');
+                showError(e.message || String(e));
+                showToast(e.message || 'Erreur lors de la génération', 'error');
+                hideProgress();
+            }
+        }
+
+        function showProgress() {
+            document.getElementById('progress-bar').style.display = 'block';
+            updateProgress(0);
+        }
+
+        function updateProgress(percent) {
+            document.getElementById('progress-fill').style.width = percent + '%';
+        }
+
+        function hideProgress() {
+            document.getElementById('progress-bar').style.display = 'none';
+        }
+
+        async function copyToClipboard() {
+            const result = document.getElementById('result').value;
+            if (!result) return;
+            
+            try {
+                await navigator.clipboard.writeText(result);
+                updateStatus('ok');
+                showToast(`Référence ${result} copiée !`, 'success');
+            } catch (e) {
+                console.error('Failed to copy:', e);
+                showToast('Erreur lors de la copie', 'error');
+            }
+        }
+
+        function exportCSV() {
+            const history = filteredHistory.length > 0 ? filteredHistory : readJSON(LS_HISTORY, []);
+            const rows = [
+                ["id", "type", "date", "juridiction", "canal", "createdAt"],
+                ...history.map(h => [h.id, h.type, h.date, h.juridiction, h.canal, h.createdAt])
+            ];
+            const csv = rows.map(r => r.map(x => `"${String(x).replace(/"/g, '""')}"`).join(",")).join("\n");
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `hexref_history_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(`${history.length} entrées exportées`, 'success');
+        }
+
+        function generateAndSetRandomSecret() {
+            const secret = generateRandomSecret();
+            document.getElementById('secret').value = secret;
+            showToast('Secret aléatoire généré', 'success');
+            
+            // Trigger validation update
+            const event = new Event('input');
+            document.getElementById('secret').dispatchEvent(event);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize theme
+            setTheme(currentTheme);
+            
+            document.getElementById('date').value = todayISO();
+
+            const storedSecret = getStoredSecret();
+            if (storedSecret) {
+                document.getElementById('secret').value = storedSecret;
+                rememberSecret = true;
+                document.getElementById('remember-switch').classList.add('checked');
+            }
+
+            updateSecretIcon();
+            updateHistory();
+            updateStatus('idle');
+
+            // Event listeners
+            document.getElementById('generate-btn').addEventListener('click', onGenerate);
+            document.getElementById('copy-btn').addEventListener('click', copyToClipboard);
+            document.getElementById('export-btn').addEventListener('click', exportCSV);
+            document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+            document.getElementById('generate-random-secret').addEventListener('click', generateAndSetRandomSecret);
+
+            document.getElementById('remember-switch').addEventListener('click', function() {
+                rememberSecret = !rememberSecret;
+                this.classList.toggle('checked', rememberSecret);
+                updateSecretIcon();
+            });
+
+            document.getElementById('search-input').addEventListener('input', function(e) {
+                filterHistory(e.target.value);
+            });
+
+            document.getElementById('juridiction').addEventListener('input', function(e) {
+                e.target.value = sanitizeInput(e.target.value).toUpperCase();
+            });
+
+            document.getElementById('canal').addEventListener('input', function(e) {
+                e.target.value = sanitizeInput(e.target.value).toUpperCase();
+            });
+
+            const inputs = ['type', 'date', 'juridiction', 'canal', 'secret'];
+            inputs.forEach(id => {
+                document.getElementById(id).addEventListener('input', function() {
+                    document.getElementById('generate-btn').disabled = !canGenerate();
+                    hideError();
+                    if (document.getElementById('result').value) {
+                        document.getElementById('result').value = '';
+                        document.getElementById('copy-btn').disabled = true;
+                        updateStatus('idle');
+                    }
+                });
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case 'g':
+                            e.preventDefault();
+                            if (canGenerate() && currentStatus !== 'working') {
+                                onGenerate();
+                            }
+                            break;
+                        case 'c':
+                            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                                e.preventDefault();
+                                if (!document.getElementById('copy-btn').disabled) {
+                                    copyToClipboard();
+                                }
+                            }
+                            break;
+                        case 'd':
+                            e.preventDefault();
+                            toggleTheme();
+                            break;
+                    }
+                }
+            });
+
+            // Welcome message
+            showToast('Application chargée avec succès !', 'success');
+        });
+    </script>
+</body>
+</html>
